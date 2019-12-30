@@ -1,0 +1,59 @@
+h2
+  |  All Blogs
+table.table.table-condensed
+  thead
+    tr
+      th
+        | Title
+      th
+        | Body
+      th
+        | Image
+      th
+        | Like
+      th
+        | Comments
+  tbody
+    - if @blogs.present?
+      - @blogs.each do |blog|
+        tr
+          td
+            = blog.title
+          td
+            = blog.body
+          td
+            = image_tag blog.image.url(:medium)
+          td
+            a.fa.fa-comment.table-icon.like-btn.btn-xs.btn.btn-warning style="cursor: pointer;" id="#{blog.id}" Like
+            p class="likes-#{blog.id}" 
+              = blog.likes.count
+          td[colspan="4"]
+            - blog.comments.each do |comment|
+              br
+              u
+                | Name 
+              = comment.name
+              br
+              u
+                | Comment
+              = comment.body
+              br
+              = link_to 'reply', new_blog_comment_path(blog, parent_id: comment.id)
+              br
+            = link_to ' your comment', new_blog_comment_path(blog)
+    - else
+      tr
+        td[colspan="5"]
+          | No Records found
+
+javascript:
+  $(document).on('click','.like-btn',function(){
+     var id = $(this).attr('id');
+     $.post('/add_like',{id: id},function(response){ 
+        if(response.success){
+          $(".likes-"+id).text(response.result)
+        }
+              console.log(response);
+             
+      });
+  });
